@@ -4,7 +4,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
-import authRouter from "./routes/auth.js";
+import authRouter from "./routes/auth.router.js";
+import resetPwdRouter from "./routes/resetPwd.routes.js";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -12,11 +13,18 @@ const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const errorMessage = err.message || "Internal Server Error";
+
+  res.status(statusCode).json({ error: errorMessage });
+});
 app.use(morgan("common"));
 app.use(cors());
 
 /* ROUTES */
 app.use("/auth", authRouter);
+app.use("/reset", resetPwdRouter);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;

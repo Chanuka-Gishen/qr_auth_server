@@ -6,9 +6,6 @@ dist/
 build/
 *.log
 
-# Ignore environment files
-.env
-
 # Ignore IDE and editor-specific files
 .vscode/
 .idea/

@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import User from "../models/User.js";
+import User from "../models/User.model.js";
 import CustomResponse from "../services/response.services.js";
 import { generateToken, verifyToken } from "../services/token.services.js";
 import {
