@@ -22,11 +22,11 @@ const UserSchema = new mongoose.Schema(
     userToken: {
       type: String,
     },
-    userQRPath: {
-      type: String,
-    },
     userPin: {
       type: Number,
+    },
+    userPinExpireAt: {
+      type: Date,
     },
     userLoginStatus: {
       type: String,

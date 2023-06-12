@@ -1,8 +1,11 @@
 import User from "../models/User.model.js";
 import ResetPwdModel from "../models/resetPwd.model.js";
+import { sendEmailEmbeddedTemplate } from "../services/mail.services.js";
 import CustomResponse from "../services/response.services.js";
-import sendSms from "../services/sms.service.js";
+//import sendSms from "../services/sms.service.js";
+import { resolve } from "path";
 import { generateRandomPin } from "../services/util.services.js";
+import { __dirname } from "../constants/common.constants.js";
 
 export const verifyEmail = async (req, res) => {
   const { userEmail } = req.body;
@@ -17,14 +20,35 @@ export const verifyEmail = async (req, res) => {
 
   const otp = generateRandomPin();
 
+  const existingResetPins = await ResetPwdModel.find({ resetUserId: user._id });
+
+  if (existingResetPins) {
+    await ResetPwdModel.deleteMany({ resetUserId: user._id });
+  }
+
   await ResetPwdModel.create({
     resetUserId: user._id,
     resetUserPin: otp,
   });
 
   //const message = "Use this OTP to reset your password - " + otp;
-
   //await sendSms(user.userMbile, message);
+
+  // Send OTP through mail - Temp
+  const pathTemplate = resolve(
+    __dirname,
+    "../assets/html/reset-otp-mail-template.html"
+  );
+  await sendEmailEmbeddedTemplate(
+    {
+      to: user.userEmail,
+      subject: "OTP verification - Reset password",
+      dataToEmbedded: {
+        otp: otp,
+      },
+    },
+    pathTemplate
+  );
 
   return res.status(200).json(new CustomResponse("auth_000", "OTP sent"));
 };
