@@ -11,6 +11,9 @@ import { connectToMailServer } from "./services/mail.services.js";
 /* CONFIGURATIONS */
 dotenv.config();
 const app = express();
+
+//mongoose.set("strictQuery", true);
+
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
