@@ -20,6 +20,12 @@ export const register = async (req, res) => {
   try {
     const { userEmail, userMobile, userPassword } = req.body;
 
+    const existingEmail = await User.findOne({ userEmail });
+
+    if (existingEmail) {
+      res.status(200).json(new CustomResponse("auth_003", "Email exists"));
+    }
+
     const newUser = new User({
       userEmail,
       userMobile: userMobile.replace(/\s/g, ""),
