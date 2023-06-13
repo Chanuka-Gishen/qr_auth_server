@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import cloudinary from "../config/cloudinary.config.js";
 
-const qrFolderPath = path.join("tmp", "qr");
+const qrFolderPath = "tmp"; // Set the path to the 'tmp' folder
 
 export const generateQRCode = async (url, userId) => {
   try {
@@ -13,12 +13,12 @@ export const generateQRCode = async (url, userId) => {
     // Generate a unique filename for the temporary file
     const tempFilename = "QR-" + userId + ".png";
 
-    // Save the QR code buffer to a temporary file
-    const tempFilePath = path.join(qrFolderPath, tempFilename);
-
     if (!fs.existsSync(qrFolderPath)) {
       fs.mkdirSync(qrFolderPath, { recursive: true });
     }
+
+    // Save the QR code buffer to a temporary file
+    const tempFilePath = path.join(qrFolderPath, tempFilename);
 
     fs.writeFileSync(tempFilePath, qrCodeBuffer);
 
