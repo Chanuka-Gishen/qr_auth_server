@@ -24,7 +24,8 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({ error: errorMessage });
 });
 app.use(morgan("common"));
-app.use(cors());
+// Enable CORS for all origins
+app.use(cors({ origin: "*" }));
 
 /* ROUTES */
 app.use("/auth", authRouter);
