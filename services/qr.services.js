@@ -1,5 +1,6 @@
 import QRCode from "qrcode";
 import fs from "fs";
+import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import cloudinary from "../config/cloudinary.config.js";
 
@@ -11,7 +12,7 @@ export const generateQRCode = async (url, userId) => {
     const qrCodeBuffer = await QRCode.toBuffer(url, { type: "png" });
 
     // Generate a unique filename for the temporary file
-    const tempFilename = "QR-" + userId + ".png";
+    const tempFilename = "QR-" + uuidv4() + ".png";
 
     if (!fs.existsSync(qrFolderPath)) {
       fs.mkdirSync(qrFolderPath, { recursive: true });
