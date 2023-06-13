@@ -2,10 +2,7 @@ import bcrypt from "bcrypt";
 import User from "../models/User.model.js";
 import CustomResponse from "../services/response.services.js";
 import { generateToken, verifyToken } from "../services/token.services.js";
-import {
-  convertIntoByteArray,
-  generateAndSaveQRCode,
-} from "../services/qr.services.js";
+import { generateQRCode } from "../services/qr.services.js";
 import { generateRandomPin } from "../services/util.services.js";
 import {
   encryptPin,
@@ -80,15 +77,18 @@ export const generateQR = async (req, res) => {
   try {
     const tokenPayload = verifyToken(req);
 
+    const user = await User.findOne({ _id: tokenPayload.id });
     // Update the URL once finalized the frontend
     const url = "www.google.com";
-    const qrFilePath = await generateAndSaveQRCode(url, tokenPayload.id);
+    const qrBufferUrl = await generateQRCode(url, tokenPayload.id);
 
-    const qrToByteArray = convertIntoByteArray(qrFilePath);
+    user.userQrUrl = qrBufferUrl;
+
+    await user.save();
 
     res
       .status(200)
-      .json(new CustomResponse("auth_000", "QR created", qrToByteArray));
+      .json(new CustomResponse("auth_000", "QR created", qrBufferUrl));
   } catch (err) {
     console.log(err);
     res.status(500).json(new CustomResponse("auth_003", "QR generate failed"));

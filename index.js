@@ -7,6 +7,7 @@ import morgan from "morgan";
 import authRouter from "./routes/auth.router.js";
 import resetPwdRouter from "./routes/resetPwd.routes.js";
 import { connectToMailServer } from "./services/mail.services.js";
+import cloudinary from "./config/cloudinary.config.js";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -35,6 +36,15 @@ app.use("/reset", resetPwdRouter);
 const PORT = process.env.PORT || 6001;
 
 connectToMailServer();
+
+// Check Cloudinary connection
+cloudinary.api.ping((error) => {
+  if (error.status != "ok") {
+    console.error("Cloudinary connection failed:");
+  } else {
+    console.log("Cloudinary connection successful!");
+  }
+});
 
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
