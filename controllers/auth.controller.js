@@ -29,7 +29,7 @@ export const register = async (req, res) => {
 
     await newUser.save();
 
-    res.status(201).json(new CustomResponse("auth_000", "User Created"));
+    res.status(200).json(new CustomResponse("auth_000", "User Created"));
   } catch (err) {
     console.log(err);
     res
@@ -83,7 +83,7 @@ export const generateQR = async (req, res) => {
     const qrToByteArray = convertIntoByteArray(qrFilePath);
 
     res
-      .status(201)
+      .status(200)
       .json(new CustomResponse("auth_000", "QR created", qrToByteArray));
   } catch (err) {
     console.log(err);
@@ -100,13 +100,13 @@ export const generatePin = async (req, res) => {
 
     if (!user) {
       return res
-        .status(400)
+        .status(200)
         .json(new CustomResponse("auth_003", "User not found"));
     }
 
     if (user.userLoginStatus != "CREDENTIAL_VERIFIED") {
       return res
-        .status(400)
+        .status(200)
         .json(new CustomResponse("auth_003", "User not logged in"));
     }
 
@@ -148,20 +148,20 @@ export const verifyPin = async (req, res) => {
   const { pin, userEmail } = req.body;
 
   if (pin === null) {
-    return res.status(400).json(new CustomResponse("auth_003", "Empty pin"));
+    return res.status(200).json(new CustomResponse("auth_003", "Empty pin"));
   }
 
   const user = await User.findOne({ userEmail });
 
   if (!user) {
     return res
-      .status(400)
+      .status(200)
       .json(new CustomResponse("auth_003", "user not found"));
   }
 
   if (user.userPin === null) {
     return res
-      .status(400)
+      .status(200)
       .json(new CustomResponse("auth_003", "Pin not generated"));
   }
 
@@ -178,7 +178,7 @@ export const verifyPin = async (req, res) => {
   const isPinMatching = isEncryptedPinMatch(pin, user.userPin);
 
   if (!isPinMatching) {
-    return res.status(400).json(new CustomResponse("auth_003", "Invalid pin"));
+    return res.status(200).json(new CustomResponse("auth_003", "Invalid pin"));
   }
 
   user.userPin = null;
