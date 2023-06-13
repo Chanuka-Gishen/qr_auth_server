@@ -45,13 +45,13 @@ export const login = async (req, res) => {
     const user = await User.findOne({ userEmail: userEmail });
     if (!user)
       return res
-        .status(400)
+        .status(200)
         .json(new CustomResponse("auth_003", "User not found"));
 
     const isMatch = await bcrypt.compare(userPassword, user.userPassword);
     if (!isMatch)
       return res
-        .status(400)
+        .status(200)
         .json(new CustomResponse("auth_003", "Invalid password"));
 
     const token = generateToken(user._id);
