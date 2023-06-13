@@ -1,49 +1,9 @@
 import QRCode from "qrcode";
 import fs from "fs";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
 import cloudinary from "../config/cloudinary.config.js";
 
-const qrFolderPath = path.join("public", "qr");
-
-export const generateAndSaveQRCode = async (url, userId) => {
-  try {
-    const QR_CODE_FILENAME = "qr_" + userId + ".png";
-    // Generate the QR code image as a buffer
-    const qrCodeBuffer = await QRCode.toBuffer(url);
-
-    // Upload the QR code buffer to Cloudinary
-    const cloudinaryResult = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: "qr_codes",
-          resource_type: "image",
-          public_id: "qr_codes" + QR_CODE_FILENAME,
-          format: "png",
-        },
-        (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(result);
-          }
-        }
-      );
-
-      uploadStream.write(qrCodeBuffer);
-      uploadStream.end();
-    });
-
-    console.log(
-      "QR code image uploaded to Cloudinary:",
-      cloudinaryResult.secure_url
-    );
-    return cloudinaryResult.secure_url;
-  } catch (error) {
-    console.error("Error generating QR code:", error);
-    throw error;
-  }
-};
+const qrFolderPath = path.join("tmp", "qr");
 
 export const generateQRCode = async (url, userId) => {
   try {
@@ -64,10 +24,10 @@ export const generateQRCode = async (url, userId) => {
 
     // Upload the QR code buffer to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
-      folder: "QrCodes", // Specify the folder where you want to save the QR codes
-      //use_filename: true, // Optionally specify the public ID for the QR code image
-      //overwrite: true, // Overwrite if a file with the same name already exists
-      //resource_type: "image", // Specify the resource type as 'image'
+      folder: "qr_codes", // Specify the folder where you want to save the QR codes
+      use_filename: true, // Optionally specify the public ID for the QR code image
+      overwrite: true, // Overwrite if a file with the same name already exists
+      resource_type: "image", // Specify the resource type as 'image'
     });
 
     // Return the Cloudinary upload result
