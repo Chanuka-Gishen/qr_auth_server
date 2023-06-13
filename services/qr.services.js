@@ -13,6 +13,10 @@ export const generateAndSaveQRCode = async (url, userId) => {
       fs.mkdirSync(qrFolderPath, { recursive: true });
     }
 
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath);
+    }
+
     await QRCode.toFile(filePath, url);
     console.log(`QR code generated and saved successfully at ${filePath}`);
     return filePath;
