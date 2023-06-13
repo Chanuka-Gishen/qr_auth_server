@@ -14,7 +14,7 @@ export const generateAndSaveQRCode = async (url, userId) => {
     }
 
     if (fs.existsSync(filePath)) {
-      fs.unlink(filePath);
+      fs.unlinkSync(filePath);
     }
 
     await QRCode.toFile(filePath, url);
