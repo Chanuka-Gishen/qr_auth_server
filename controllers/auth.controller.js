@@ -22,7 +22,7 @@ export const register = async (req, res) => {
 
     const newUser = new User({
       userEmail,
-      userMobile,
+      userMobile: userMobile.replace(/\s/g, ""),
       userPassword,
       userLoginStatus: "LOGGED_OFF",
     });
