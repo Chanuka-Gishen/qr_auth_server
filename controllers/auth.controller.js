@@ -32,9 +32,7 @@ export const register = async (req, res) => {
     res.status(200).json(new CustomResponse("auth_000", "User Created"));
   } catch (err) {
     console.log(err);
-    res
-      .status(500)
-      .json(new CustomResponse("auth_003", "User not created", toString(err)));
+    res.status(500).json(new CustomResponse("auth_003", "User not created"));
   }
 };
 
