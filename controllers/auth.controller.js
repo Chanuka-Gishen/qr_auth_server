@@ -82,10 +82,6 @@ export const generateQR = async (req, res) => {
     const url = "www.google.com";
     const qrBufferUrl = await generateQRCode(url, tokenPayload.id);
 
-    user.userQrUrl = qrBufferUrl;
-
-    await user.save();
-
     res
       .status(200)
       .json(new CustomResponse("auth_000", "QR created", qrBufferUrl));
@@ -98,9 +94,9 @@ export const generateQR = async (req, res) => {
 /* GENERATING AUTH ENCRYPTED PIN */
 export const generatePin = async (req, res) => {
   try {
-    const { userEmail } = req.body;
+    const { userId } = req.body;
 
-    const user = await User.findOne({ userEmail });
+    const user = await User.findOne({ _id: userId });
 
     if (!user) {
       return res
@@ -140,7 +136,9 @@ export const generatePin = async (req, res) => {
       pathTemplate
     );
 
-    return res.status(200).json(new CustomResponse("auth_000", "Pin sent"));
+    return res
+      .status(200)
+      .json(new CustomResponse("auth_000", "Pin sent to " + user.userEmail));
   } catch (err) {
     console.log(err);
     res.status(500).json(new CustomResponse("auth_003", "Pin generate failed"));
@@ -149,13 +147,13 @@ export const generatePin = async (req, res) => {
 
 /* VERIFY ENCRYPTED PIN */
 export const verifyPin = async (req, res) => {
-  const { pin, userEmail } = req.body;
+  const { pin, userId } = req.body;
 
   if (pin === null) {
     return res.status(200).json(new CustomResponse("auth_003", "Empty pin"));
   }
 
-  const user = await User.findOne({ userEmail });
+  const user = await User.findOne({ _id: userId });
 
   if (!user) {
     return res

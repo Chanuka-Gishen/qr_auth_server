@@ -14,7 +14,7 @@ export const verifyEmail = async (req, res) => {
 
   if (!user) {
     return res
-      .status(404)
+      .status(200)
       .json(new CustomResponse("auth_004", "User not found"));
   }
 
@@ -50,7 +50,9 @@ export const verifyEmail = async (req, res) => {
     pathTemplate
   );
 
-  return res.status(200).json(new CustomResponse("auth_000", "OTP sent"));
+  return res
+    .status(200)
+    .json(new CustomResponse("auth_000", "OTP sent to " + user.userEmail));
 };
 
 export const verifyOtp = async (req, res) => {
@@ -60,7 +62,7 @@ export const verifyOtp = async (req, res) => {
 
   if (!user) {
     return res
-      .status(404)
+      .status(200)
       .json(new CustomResponse("auth_004", "User not found"));
   }
 
@@ -68,12 +70,12 @@ export const verifyOtp = async (req, res) => {
 
   if (!resetPin) {
     return res
-      .status(404)
+      .status(200)
       .json(new CustomResponse("auth_004", "OTP not found"));
   }
 
   if (resetUserPin != resetPin.resetUserPin) {
-    return res.status(404).json(new CustomResponse("auth_004", "Invalid OTP"));
+    return res.status(200).json(new CustomResponse("auth_004", "Invalid OTP"));
   }
 
   await ResetPwdModel.deleteOne({ resetUserId: user._id });
@@ -88,13 +90,13 @@ export const resetPassword = async (req, res) => {
 
   if (!user) {
     return res
-      .status(404)
+      .status(200)
       .json(new CustomResponse("auth_004", "User not found"));
   }
 
   if (newPassword === null) {
     return res
-      .status(404)
+      .status(200)
       .json(new CustomResponse("auth_004", "Empty password"));
   }
 
@@ -102,10 +104,12 @@ export const resetPassword = async (req, res) => {
 
   try {
     await user.save();
+
+    return res.status(200).json(new CustomResponse("auth_000", "Successful"));
   } catch (err) {
     console.log(err);
     return res
-      .status(404)
+      .status(200)
       .json(new CustomResponse("auth_004", "Password change failed"));
   }
 };
