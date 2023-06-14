@@ -8,9 +8,10 @@ import {
   encryptPin,
   isEncryptedPinMatch,
 } from "../services/encryption.services.js";
-import { sendEmailEmbeddedTemplate } from "../services/mail.services.js";
-import { resolve } from "path";
+//import { sendEmailEmbeddedTemplate } from "../services/mail.services.js";
+//import { resolve } from "path";
 import { __dirname } from "../constants/common.constants.js";
+import { sendSmsNotifyApi } from "../services/sms.service.js";
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -121,27 +122,37 @@ export const generatePin = async (req, res) => {
     await user.save();
 
     // Send PIN through mail - Temp
-    const pathTemplate = resolve(
-      __dirname,
-      "../assets/html/qr-pin-mail-template.html"
-    );
-    await sendEmailEmbeddedTemplate(
-      {
-        to: user.userEmail,
-        subject: "Pin verification - Login",
-        dataToEmbedded: {
-          otp: encryptedPin,
-        },
-      },
-      pathTemplate
-    );
+    // const pathTemplate = resolve(
+    //   __dirname,
+    //   "../assets/html/qr-pin-mail-template.html"
+    // );
+    // await sendEmailEmbeddedTemplate(
+    //   {
+    //     to: user.userEmail,
+    //     subject: "Pin verification - Login",
+    //     dataToEmbedded: {
+    //       otp: encryptedPin,
+    //     },
+    //   },
+    //   pathTemplate
+    // );
 
-    return res
-      .status(200)
-      .json(new CustomResponse("auth_000", "Pin sent to " + user.userEmail));
+    // Send PIN through SMS
+    const message = "Your PIN - " + encryptedPin;
+    const isSmsSent = await sendSmsNotifyApi(user.userMobile, message);
+
+    if (isSmsSent) {
+      return res
+        .status(200)
+        .json(new CustomResponse("auth_000", "Pin sent to " + user.userMobile));
+    } else {
+      return res
+        .status(200)
+        .json(new CustomResponse("auth_003", "Send SMS failed"));
+    }
   } catch (err) {
     console.log(err);
-    res.status(500).json(new CustomResponse("auth_003", "Pin generate failed"));
+    res.status(200).json(new CustomResponse("auth_003", "Pin generate failed"));
   }
 };
 
@@ -173,7 +184,7 @@ export const verifyPin = async (req, res) => {
   // Compare the expiration time with the current time
   if (user.userPinExpireAt <= currentTime) {
     // The expiration time has passed
-    return res.status(400).json(new CustomResponse("auth_003", "Pin expired"));
+    return res.status(200).json(new CustomResponse("auth_003", "Pin expired"));
   }
 
   // The expiration time has not yet passed

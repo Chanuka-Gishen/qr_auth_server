@@ -1,10 +1,15 @@
 import moment from "moment";
+import dotenv from "dotenv";
 import md5 from "md5";
 import { SMS_DATE_TYPE } from "../constants/common.constants.js";
+import axios from "axios";
 
-const MASK = "Glibs";
+dotenv.config();
 
-const sendSms = async (mobileNumber, smsContent) => {
+const MASK = "";
+const SUCCESS_RES = "success";
+
+export const sendSmsDialogApi = async (mobileNumber, smsContent) => {
   await axios({
     headers: {
       "Content-Type": "application/json",
@@ -44,4 +49,27 @@ const sendSms = async (mobileNumber, smsContent) => {
     });
 };
 
-export default sendSms;
+export const sendSmsNotifyApi = async (mobileNumber, smsContent) => {
+  await axios({
+    url: process.env.NOTF_SMS_API_URL,
+    method: "POST",
+    params: {
+      user_id: process.env.NOTF_SMS_USER_ID,
+      api_key: process.env.NOTF_SMS_API_KEY,
+      sender_id: process.env.NOTF_SMS_SENDER_ID,
+      to: "94" + mobileNumber,
+      message: smsContent,
+    },
+  })
+    .then((res) => {
+      if (res.data.status === SUCCESS_RES) {
+        return true;
+      } else {
+        return false;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
+};
