@@ -1,11 +1,9 @@
 import User from "../models/User.model.js";
 import ResetPwdModel from "../models/resetPwd.model.js";
-import { sendEmailEmbeddedTemplate } from "../services/mail.services.js";
 import CustomResponse from "../services/response.services.js";
-//import sendSms from "../services/sms.service.js";
-import { resolve } from "path";
 import { generateRandomPin } from "../services/util.services.js";
 import { __dirname } from "../constants/common.constants.js";
+import { sendSmsNotifyApi } from "../services/sms.service.js";
 
 export const verifyEmail = async (req, res) => {
   const { userEmail } = req.body;
@@ -31,28 +29,18 @@ export const verifyEmail = async (req, res) => {
     resetUserPin: otp,
   });
 
-  //const message = "Use this OTP to reset your password - " + otp;
-  //await sendSms(user.userMbile, message);
+  const message = "Reset password OTP - " + otp;
+  const isSmsSent = await sendSmsNotifyApi(user.userMobile, message);
 
-  // Send OTP through mail - Temp
-  const pathTemplate = resolve(
-    __dirname,
-    "../assets/html/reset-otp-mail-template.html"
-  );
-  await sendEmailEmbeddedTemplate(
-    {
-      to: user.userEmail,
-      subject: "OTP verification - Reset password",
-      dataToEmbedded: {
-        otp: otp,
-      },
-    },
-    pathTemplate
-  );
-
-  return res
-    .status(200)
-    .json(new CustomResponse("auth_000", "OTP sent to " + user.userEmail));
+  if (isSmsSent) {
+    return res
+      .status(200)
+      .json(new CustomResponse("auth_000", "OTP sent to your mobile"));
+  } else {
+    return res
+      .status(200)
+      .json(new CustomResponse("auth_003", "OTP send failed"));
+  }
 };
 
 export const verifyOtp = async (req, res) => {

@@ -6,7 +6,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import authRouter from "./routes/auth.router.js";
 import resetPwdRouter from "./routes/resetPwd.routes.js";
-import { connectToMailServer } from "./services/mail.services.js";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -33,8 +32,6 @@ app.use("/reset", resetPwdRouter);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
-
-connectToMailServer();
 
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,

@@ -19,9 +19,6 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 5,
     },
-    userQrUrl: {
-      type: String,
-    },
     userToken: {
       type: String,
     },
