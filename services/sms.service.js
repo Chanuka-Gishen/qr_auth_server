@@ -50,6 +50,7 @@ export const sendSmsDialogApi = async (mobileNumber, smsContent) => {
 };
 
 export const sendSmsNotifyApi = async (mobileNumber, smsContent) => {
+  let isSmsSent = false;
   await axios({
     url: process.env.NOTF_SMS_API_URL,
     method: "POST",
@@ -62,14 +63,15 @@ export const sendSmsNotifyApi = async (mobileNumber, smsContent) => {
     },
   })
     .then((res) => {
+      console.log(res.data);
       if (res.data.status === SUCCESS_RES) {
-        return true;
-      } else {
-        return false;
+        isSmsSent = true;
       }
     })
     .catch((err) => {
       console.log(err);
       return false;
     });
+
+  return isSmsSent;
 };

@@ -31,6 +31,7 @@ export const verifyEmail = async (req, res) => {
 
   const message = "Reset password OTP - " + otp;
   const isSmsSent = await sendSmsNotifyApi(user.userMobile, message);
+  console.log("smsSend: " + isSmsSent);
 
   if (isSmsSent) {
     return res
