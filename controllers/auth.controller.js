@@ -79,8 +79,15 @@ export const generateQR = async (req, res) => {
     const tokenPayload = verifyToken(req);
 
     const user = await User.findOne({ _id: tokenPayload.id });
+
+    if (!user) {
+      return res
+        .status(200)
+        .json(new CustomResponse("auth_003", "User not found"));
+    }
+
     // Update the URL once finalized the frontend
-    const url = "www.google.com";
+    const url = "http://13.48.148.64:3024/verifyPin/" + tokenPayload.id;
     const qrBufferUrl = await generateQRCode(url, tokenPayload.id);
 
     res
