@@ -1,5 +1,5 @@
 import User from "../models/User.model.js";
-import ResetPwdModel from "../models/ResetPwd.model.js";
+import ResetPwdModel from "../models/resetPwd.model.js";
 import CustomResponse from "../services/response.services.js";
 import { generateRandomPin } from "../services/util.services.js";
 import { __dirname } from "../constants/common.constants.js";
