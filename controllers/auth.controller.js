@@ -124,24 +124,16 @@ export const generatePin = async (req, res) => {
     user.userPin = pin;
     user.userPinExpireAt = expireAt;
 
-    const savedUser = await user.save();
+    await user.save();
 
     // Send PIN through SMS
     const message = "Your PIN - " + encryptedPin;
     const isSmsSent = await sendSmsNotifyApi(user.userMobile, message);
 
-    delete savedUser.userPassword;
-
     if (isSmsSent) {
       return res
         .status(200)
-        .json(
-          new CustomResponse(
-            "auth_000",
-            "Pin sent to " + user.userMobile,
-            savedUser
-          )
-        );
+        .json(new CustomResponse("auth_000", "Pin sent to " + user.userMobile));
     } else {
       return res
         .status(200)
@@ -195,9 +187,13 @@ export const verifyPin = async (req, res) => {
   user.userPinExpireAt = null;
   user.userLoginStatus = "LOGGED_IN";
 
-  await user.save();
+  const savedUser = await user.save();
 
-  return res.status(200).json(new CustomResponse("auth_000", "Pin verified"));
+  delete savedUser.userPassword;
+
+  return res
+    .status(200)
+    .json(new CustomResponse("auth_000", "Pin verified", savedUser));
 };
 
 /* VERIFY ENCRYPTED PIN */
