@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  checkUserStatusLoggedIn,
   generatePin,
   generateQR,
   login,
@@ -15,5 +16,6 @@ authRouter.post("/login", login);
 authRouter.get("/qr", [verifyToken], generateQR);
 authRouter.post("/generatePin", generatePin);
 authRouter.post("/verifyPin", verifyPin);
+authRouter.get("/checkStatus", [verifyToken], checkUserStatusLoggedIn);
 
 export default authRouter;

@@ -8,8 +8,6 @@ import {
   encryptPin,
   isEncryptedPinMatch,
 } from "../services/encryption.services.js";
-//import { sendEmailEmbeddedTemplate } from "../services/mail.services.js";
-//import { resolve } from "path";
 import { __dirname } from "../constants/common.constants.js";
 import { sendSmsNotifyApi } from "../services/sms.service.js";
 
@@ -126,32 +124,24 @@ export const generatePin = async (req, res) => {
     user.userPin = pin;
     user.userPinExpireAt = expireAt;
 
-    await user.save();
-
-    // Send PIN through mail - Temp
-    // const pathTemplate = resolve(
-    //   __dirname,
-    //   "../assets/html/qr-pin-mail-template.html"
-    // );
-    // await sendEmailEmbeddedTemplate(
-    //   {
-    //     to: user.userEmail,
-    //     subject: "Pin verification - Login",
-    //     dataToEmbedded: {
-    //       otp: encryptedPin,
-    //     },
-    //   },
-    //   pathTemplate
-    // );
+    const savedUser = await user.save();
 
     // Send PIN through SMS
     const message = "Your PIN - " + encryptedPin;
     const isSmsSent = await sendSmsNotifyApi(user.userMobile, message);
 
+    delete savedUser.userPassword;
+
     if (isSmsSent) {
       return res
         .status(200)
-        .json(new CustomResponse("auth_000", "Pin sent to " + user.userMobile));
+        .json(
+          new CustomResponse(
+            "auth_000",
+            "Pin sent to " + user.userMobile,
+            savedUser
+          )
+        );
     } else {
       return res
         .status(200)
@@ -208,4 +198,21 @@ export const verifyPin = async (req, res) => {
   await user.save();
 
   return res.status(200).json(new CustomResponse("auth_000", "Pin verified"));
+};
+
+/* VERIFY ENCRYPTED PIN */
+export const checkUserStatusLoggedIn = async (req, res) => {
+  const tokenPayload = verifyToken(req);
+
+  const user = await User.findOne({ _id: tokenPayload.id });
+
+  if (user.userLoginStatus === "LOGGED_IN") {
+    return res
+      .status(200)
+      .json(new CustomResponse("auth_000", "User logged-in"));
+  }
+
+  return res
+    .status(200)
+    .json(new CustomResponse("auth_003", "User not logged-in"));
 };
